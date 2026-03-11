@@ -1,68 +1,78 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
+  background-color: #ffffff; /* Change to White */
+  color: #000000;           /* Change to Black */
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
   margin: 0;
+  display: block;           /* Changed from 'flex' so content flows down */
+ overflow-y: auto;      /* Allow scrolling so text isn't cut off */
+}
+
+/* Update your glass card so it's visible on white */
+.glass-card {
+  background: rgba(0, 0, 0, 0.03); /* Dark tint instead of light */
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #000000;
+}
+
+.page-wrapper {
+  width: 100vw;
+  height: 100vh;
   display: flex;
-  place-items: center;
-  min-width: 320px;
+  justify-content: center;
+  align-items: center;
+}
+
+.glass-card {
+  width: 90%;
+  max-width: 1100px;
+  height: 85vh;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 32px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.scroll-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+}
+
+/* THE PHOTO FIX: This prevents the image from being huge */
+.profile-image {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #00a0dc;
+  display: block;
+  margin: 0 auto 1.5rem;
+}
+
+
+/* Change this: */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+body {
+  background-color: #ffffff; /* White background */
+  color: #000000;           /* Global black text */
+  display: block;           /* Ensures content flows naturally */
+  overflow-y: auto;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.glass-card {
+  background: rgba(0, 0, 0, 0.05); /* Light gray tint instead of white tint */
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #000000;
 }
