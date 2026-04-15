@@ -1,66 +1,46 @@
-/* src/index.css */
-
-:root {
-  /* OrangeCoeur Brand Colors */
-  --brand-primary: #1a365d; /* Deep Navy */
-  --brand-accent: #3182ce;  /* Bright Blue */
-  --text-main: #2d3748;
-  --bg-light: #f7fafc;
-  --white: #ffffff;
-  
-  font-family: 'Inter', system-ui, sans-serif;
-  background-color: var(--bg-light);
-  color: var(--text-main);
-}
-
+/* Standard Body Setup */
 body {
   margin: 0;
+  background-color: #f8fafc;
+  overflow-y: auto; /* Replaces the internal scrollbar */
+}
+
+.page-wrapper {
+  width: 100%;
+}
+
+.main-nav {
   display: flex;
   justify-content: center;
-  overflow-y: auto;
+  gap: 40px;
+  padding: 30px 0;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-#root {
-  width: 100%;
-  max-width: 800px; /* Keeps content from stretching too wide */
-  padding: 2rem;
+.main-nav a {
+  text-decoration: none;
+  color: #00a0dc;
+  font-weight: 600;
+  font-size: 1.1rem;
 }
 
-/* Header Layout: Photo + Text side-by-side */
-header {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  border-bottom: 2px solid var(--brand-primary);
-  padding-bottom: 2rem;
-  margin-bottom: 2rem;
+/* The Main Container: 1200px is the industry standard for "Normal" */
+.content-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
 }
 
-header img {
-  border-radius: 50%; /* Makes your square profile photo a circle */
-  border: 3px solid var(--brand-accent);
-  object-fit: cover;
-}
-
-h1 {
-  margin: 0;
-  color: var(--brand-primary);
-  font-size: 2.5rem;
-}
-
-section {
-  margin-bottom: 3rem;
-}
-
-h2 {
-  color: var(--brand-accent);
-  border-left: 4px solid var(--brand-accent);
-  padding-left: 1rem;
-}
-
-footer {
+.page-title {
   text-align: center;
-  font-size: 0.8rem;
-  color: #718096;
-  margin-top: 4rem;
+  font-size: 3rem;
+  margin-bottom: 2rem;
+  color: #1e293b;
+}
+
+.entries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
 }

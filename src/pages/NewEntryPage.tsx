@@ -1,21 +1,24 @@
-
-
-// 1. You MUST import the form component here
+import { useNavigate } from 'react-router-dom';
 import NewEntryForm from '../components/NewEntryForm';
+import type { Mood } from '../data/entries';
 
 interface NewEntryPageProps {
-  onAddEntry: (title: string, content: string) => void;
+  onAddEntry: (title: string, summary: string, mood: Mood, tags: string[]) => void;
 }
 
 export default function NewEntryPage({ onAddEntry }: NewEntryPageProps) {
+  const navigate = useNavigate();
+
+  const handleFormSubmit = (title: string, summary: string, mood: Mood, tags: string[]) => {
+    onAddEntry(title, summary, mood, tags);
+    navigate('/entries');
+  };
+
   return (
-    <div style={{ padding: '60px 20px', maxWidth: '800px', margin: '0 auto' }}>
-      <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '20px' }}>
-        New Entry
-      </h2>
-      
-      {/* 2. This tag now correctly calls the inputs you built */}
-      <NewEntryForm onAddEntry={onAddEntry} />
+    <div style={{ maxWidth: '600px', margin: '40px auto' }}>
+      <h1 style={{ textAlign: 'center' }}>New Journal Entry</h1>
+      {/* FORM USES 'onSubmit' */}
+      <NewEntryForm onSubmit={handleFormSubmit} submitLabel="Create Entry" />
     </div>
   );
 }

@@ -1,62 +1,119 @@
-import { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
-import Header from './components/Header';
-import Footer from './components/Footer';
+import { Routes, Route, Link, useSearchParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+
+// API & Data Imports
+import { toEntry, type Entry, type Mood } from './data/entries';
+import { fetchEntries, createEntry, deleteEntry, updateEntry, fetchTags } from './api/entries.ts'; 
+
+// Component Imports
+import EntryCard from './components/EntryCard';
+import TagFilter from './components/TagFilter';
+
+// Page Imports
 import Home from './pages/Home';
 import About from './pages/About';
-import Logs from './pages/Logs';
 import NewEntryPage from './pages/NewEntryPage';
-import seedEntries from './data/entries';
-import type { Entry } from './data/entries';
+import EditEntryPage from './pages/EditEntryPage';
 
-// 1. REMOVE 'export default' from this internal component
-function AppContent() {
-  const [entries, setEntries] = useState<Entry[]>(seedEntries);
-  const navigate = useNavigate();
+export default function App() {
+  const [entries, setEntries] = useState<Entry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  
+  // 0. Connect to URL Search Parameters
+  const [searchParams] = useSearchParams();
+  const activeTag = searchParams.get('tag') || undefined;
 
-  const handleAddEntry = (title: string, content: string) => {
-    const newEntry: Entry = {
-      id: Date.now(),
-      title,
-      date: new Date().toISOString().slice(0, 10),
-      category: 'Development',
-      summary: content,
-    };
-    setEntries((prev) => [newEntry, ...prev]);
-    navigate('/entries');
+  // 1. Fetch entries (re-runs when activeTag in URL changes)
+  useEffect(() => {
+    setLoading(true);
+    fetchEntries(activeTag)
+      .then((raw) => setEntries(raw.map(toEntry)))
+      .catch((err) => console.error("Load failed:", err))
+      .finally(() => setLoading(false));
+  }, [activeTag]);
+
+  // 2. Fetch unique tags list once for the dropdown
+  useEffect(() => {
+    fetchTags().then(setAvailableTags).catch(console.error);
+  }, []);
+
+  // 3. CRUD Handlers
+  const handleAddEntry = async (title: string, summary: string, mood: Mood, tags: string[]) => {
+    try {
+      const raw = await createEntry({ title, summary, mood, tags: tags.join(',') });
+      setEntries((prev) => [toEntry(raw), ...prev]);
+    } catch (err) {
+      alert("Save failed");
+    }
   };
 
-  const handleDeleteEntry = (id: number) => {
-    setEntries((prev) => prev.filter(entry => entry.id !== id));
+  const handleUpdateEntry = async (id: number, title: string, summary: string, mood: Mood, tags: string[]) => {
+    try {
+      await updateEntry(id, { title, summary, mood, tags: tags.join(',') });
+      setEntries(prev => prev.map(e => e.id === id ? { ...e, title, summary, mood, tags } : e));
+    } catch (err) {
+      alert("Update failed");
+    }
+  };
+
+  const handleDelete = async (id: string | number) => {
+    if (!window.confirm("Delete permanently?")) return;
+    try {
+      await deleteEntry(Number(id));
+      setEntries(prev => prev.filter(e => e.id !== Number(id)));
+    } catch (err) {
+      alert("Delete failed");
+    }
   };
 
   return (
-    <>
-      <Header />
-      <main style={{ minHeight: '80vh', backgroundColor: '#f9f9f9' }}>
+    <div className="page-wrapper">
+      <nav className="main-nav" style={{ display: 'flex', gap: '15px', padding: '20px', borderBottom: '1px solid #eee' }}>
+        <Link to="/">Home</Link>
+        <Link to="/new">New Entry</Link>
+        <Link to="/entries">Journal logs</Link>
+        <Link to="/about">About</Link>
+      </nav>
+
+      <main className="content-container">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
+          
+          <Route path="/new" element={
+            <NewEntryPage onAddEntry={handleAddEntry} />
+          } />
+
           <Route 
-            path="/entries" 
-            element={<Logs entries={entries} onDelete={handleDeleteEntry} />} 
+            path="/entries/:id/edit" 
+            element={<EditEntryPage entries={entries} onUpdate={handleUpdateEntry} />} 
           />
-          <Route 
-            path="/entries/new" 
-            element={<NewEntryPage onAddEntry={handleAddEntry} />} 
-          />
+
+          <Route path="/entries" element={
+            <div className="standard-section" style={{ padding: '20px' }}>
+              <h1 className="page-title">
+                {activeTag ? `Journal logs: ${activeTag}` : 'Journal logs'}
+              </h1>
+              
+              {/* Filter Dropdown */}
+              <TagFilter tags={availableTags} />
+
+              {loading && <p>Loading...</p>}
+              
+              <div className="entries-list">
+                {entries.map((entry) => (
+                  <EntryCard 
+                    key={entry.id} 
+                    entry={entry} 
+                    onDelete={handleDelete} 
+                  />
+                ))}
+              </div>
+            </div>
+          } />
         </Routes>
       </main>
-      <Footer />
-    </>
-  );
-}
-
-// 2. This is the ONLY default export that should remain
-export default function App() {
-  return (
-    <Router>
-      <AppContent />
-    </Router>
+    </div>
   );
 }
