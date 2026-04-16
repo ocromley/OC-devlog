@@ -2,6 +2,7 @@ import { Routes, Route, Link, useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
 // API & Data Imports
+// Ensure your Entry interface in ./data/entries includes 'category: string'
 import { toEntry, type Entry, type Mood } from './data/entries';
 import { fetchEntries, createEntry, deleteEntry, updateEntry, fetchTags } from './api/entries.ts'; 
 
@@ -14,6 +15,21 @@ import Home from './pages/Home';
 import About from './pages/About';
 import NewEntryPage from './pages/NewEntryPage';
 import EditEntryPage from './pages/EditEntryPage';
+
+/**
+ * Interface representing the raw data structure returned from the API.
+ * This resolves the TS2345 mapping error.
+ */
+interface ApiEntry {
+  id: number;
+  title: string;
+  summary: string;
+  mood: Mood;
+  tags: string; // The API returns tags as a comma-separated string
+  category: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function App() {
   const [entries, setEntries] = useState<Entry[]>([]);
@@ -28,7 +44,11 @@ export default function App() {
   useEffect(() => {
     setLoading(true);
     fetchEntries(activeTag)
-      .then((raw) => setEntries(raw.map(toEntry)))
+      // Explicitly type 'raw' as ApiEntry[] to match toEntry's expected parameter
+      .then((raw: any) => {
+        const data = raw as ApiEntry[];
+        setEntries(data.map(toEntry));
+      })
       .catch((err) => console.error("Load failed:", err))
       .finally(() => setLoading(false));
   }, [activeTag]);
@@ -42,7 +62,7 @@ export default function App() {
   const handleAddEntry = async (title: string, summary: string, mood: Mood, tags: string[]) => {
     try {
       const raw = await createEntry({ title, summary, mood, tags: tags.join(',') });
-      setEntries((prev) => [toEntry(raw), ...prev]);
+      setEntries((prev) => [toEntry(raw as ApiEntry), ...prev]);
     } catch (err) {
       alert("Save failed");
     }

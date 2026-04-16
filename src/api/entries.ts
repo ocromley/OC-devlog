@@ -1,6 +1,13 @@
+export interface Entry {
+  id: number;
+  title: string;
+  content: string;
+  category: string; // This is the missing piece!
+  createdAt?: string;
+}
 const BASE = '/api';
 
-export async function fetchEntries(tag?: string) {
+export async function fetchEntries(tag?: string): Promise<Entry[]> {
   const url = tag ? `${BASE}/entries?tag=${encodeURIComponent(tag)}` : `${BASE}/entries`;
   const res = await fetch(url);
   return res.json();
